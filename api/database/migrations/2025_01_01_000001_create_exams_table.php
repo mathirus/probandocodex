@@ -5,31 +5,22 @@ use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         DB::statement(<<<SQL
-            CREATE TABLE users (
+            CREATE TABLE exams (
                 id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                nombre VARCHAR(255) NOT NULL,
-                apellido VARCHAR(255) NOT NULL,
-                email VARCHAR(255) NOT NULL UNIQUE,
-                password VARCHAR(255) NOT NULL,
-                dni VARCHAR(20) NOT NULL,
-                curso VARCHAR(255) NOT NULL,
+                titulo VARCHAR(255) NOT NULL,
+                fecha_inicio DATE NOT NULL,
+                fecha_fin DATE NOT NULL,
                 created_at TIMESTAMP NULL,
                 updated_at TIMESTAMP NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
         SQL);
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        DB::statement('DROP TABLE IF EXISTS users');
+        DB::statement('DROP TABLE IF EXISTS exams');
     }
 };
