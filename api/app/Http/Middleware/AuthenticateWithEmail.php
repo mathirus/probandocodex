@@ -4,19 +4,31 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class AuthenticateWithEmail
 {
     public function handle(Request $request, Closure $next)
     {
-        $email = $request->input('email') ?: $request->header('X-User-Email');
+        $token = $request->bearerToken();
 
-        if (!$email || !User::where('email', $email)->exists()) {
+        if (!$token) {
             return response()->json(['message' => 'Unauthenticated'], 401);
         }
 
-        $user = User::where('email', $email)->first();
+        $hashed = hash('sha256', $token);
+        $record = DB::selectOne('SELECT tokenable_id FROM personal_access_tokens WHERE token = ?', [$hashed]);
+
+        if (!$record) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+
+        $user = DB::selectOne('SELECT * FROM users WHERE id = ?', [$record->tokenable_id]);
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+
         $request->setUserResolver(fn () => $user);
 
         return $next($request);
