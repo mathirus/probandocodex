@@ -1,0 +1,103 @@
+version: "3.1"
+
+networks:
+    default-network:
+
+services:
+    api:
+        image: nanoninja/php-fpm:8.1
+        depends_on:
+            - dbtpfinal
+        ports:
+            - 8000:8000
+        volumes:
+            - ./:/var/www/html
+            - ./vendor/laravel/sail/runtimes/8.1/php.ini:/usr/local/etc/php/php.ini
+            - ./:/var/www/html:delegated
+        command: php -S="0.0.0.0:8000" -t="/var/www/html/public"
+        networks:
+            - default-network
+        deploy:
+            resources:
+                limits:
+                    cpus: "3.50"
+                    memory: 1024M
+        #command: php artisan serve
+
+    dbtpfinal:
+        container_name: dbtpfinal
+        hostname: dbtpfinal
+        image: mysql:latest
+        restart: always
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: password
+            MYSQL_DATABASE: dentaldatabase
+            MYSQL_USER: odontologo
+            MYSQL_PASSWORD: password
+        volumes:
+            - mydata:/var/lib/mysql
+        networks:
+            - default-network
+        deploy:
+            resources:
+                limits:
+                    cpus: "2.00"
+                    memory: 2048M
+
+volumes:
+    mydata:
+        driver: local
+# Version mas rapida de docker-compose, sin deploy.resources
+# version: "3.1"
+
+# networks:
+#     default-network:
+
+# services:
+#     api:
+#         image: nanoninja/php-fpm:8.1
+#         depends_on:
+#             - dbdental
+#         ports:
+#             - "8000:8000"
+#         volumes:
+#             # Sólo un bind-mount, con delegated (más rápido en Win/Mac)
+#             - ./:/var/www/html:delegated
+#             # tu php.ini personalizado
+#             - ./vendor/laravel/sail/runtimes/8.1/php.ini:/usr/local/etc/php/php.ini
+#         command: php -S "0.0.0.0:8000" -t "/var/www/html/public"
+#         networks:
+#             - default-network
+#         # <– quité deploy.resources para que no haya límites en dev
+
+#     dbdental:
+#         container_name: dbdental
+#         hostname: dbdental
+#         image: mysql:latest
+#         restart: always
+#         ports:
+#             - "3306:3306"
+#         environment:
+#             MYSQL_ROOT_PASSWORD: password
+#             MYSQL_DATABASE: dentaldatabase
+#             MYSQL_USER: odontologo
+#             MYSQL_PASSWORD: password
+#         volumes:
+#             - mydata:/var/lib/mysql
+#         networks:
+#             - default-network
+#         # <– sin límites para que MySQL aproveche toda la RAM
+
+#     redis:
+#         image: redis:latest
+#         ports:
+#             - "6379:6379"
+#         networks:
+#             - default-network
+#         # <– idem, sin deploy.resources
+
+# volumes:
+#     mydata:
+#         driver: local
