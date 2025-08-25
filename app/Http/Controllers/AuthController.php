@@ -47,13 +47,6 @@ class AuthController extends Controller
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
-        $token = bin2hex(random_bytes(40));
-        $hashed = hash('sha256', $token);
-        DB::insert(
-            'INSERT INTO personal_access_tokens (tokenable_type, tokenable_id, name, token, abilities, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())',
-            ['user', $user->id, 'auth_token', $hashed, '["*"]']
-        );
-
-        return response()->json(['token' => $token]);
+        return response()->json(['dni' => $user->dni]);
     }
 }
